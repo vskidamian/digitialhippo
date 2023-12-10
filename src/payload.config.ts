@@ -36,5 +36,3 @@ export default buildConfig({
         outputFile: path.resolve(__dirname, "payload-types.ts")
     }
 })
-
-//TODO: 2:25:22
