@@ -41,11 +41,10 @@ const Page = () => {
     resolver: zodResolver(AuthCredentialsValidator),
   });
 
+  //todo: 5:29:29
   const { mutate: signIn, isLoading } = trpc.auth.signIn.useMutation({
     onSuccess: () => {
       toast.success("Signed in successfully");
-
-      router.refresh();
 
       if (origin) {
         router.push(`/${origin}`);
@@ -58,6 +57,8 @@ const Page = () => {
       }
 
       router.push("/");
+
+      router.refresh();
     },
     onError: (err) => {
       if (err.data?.code === "UNAUTHORIZED") {
