@@ -41,7 +41,6 @@ const Page = () => {
     resolver: zodResolver(AuthCredentialsValidator),
   });
 
-  //todo: 5:29:29
   const { mutate: signIn, isLoading } = trpc.auth.signIn.useMutation({
     onSuccess: () => {
       toast.success("Signed in successfully");
@@ -71,7 +70,6 @@ const Page = () => {
     signIn({ email, password });
   };
 
-  //todo: 5:09
   return (
     <>
       <div className="container relative flex pt-20 flex-col items-center justify-center lg:px-0">
