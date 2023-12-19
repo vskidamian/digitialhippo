@@ -4,7 +4,9 @@ import { Product } from "@/payload-types";
 import { useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
+import { PRODUCT_CATEGORIES } from "@/config";
+import ImageSlider from "./ImageSlider";
 
 type ProductListingProps = {
   product: Product | null;
@@ -13,6 +15,14 @@ type ProductListingProps = {
 
 const ProductListing = ({ product, index }: ProductListingProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
+
+  const productCategoryLabel = PRODUCT_CATEGORIES.find(
+    ({ value }) => value === product?.category
+  )?.label;
+
+  const urls = product?.images
+    .map(({ image }) => (typeof image === "string" ? image : image.url))
+    .filter(Boolean) as string[];
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -29,7 +39,18 @@ const ProductListing = ({ product, index }: ProductListingProps) => {
         className={cn("invisible h-full w-full cursor-pointer group/main", {
           "visible animate-in fade-in-5": isVisible,
         })}
-        href={`/product/${product.id}`}></Link>
+        href={`/product/${product.id}`}>
+        <div className="flex flex-col w-full">
+          <ImageSlider urls={urls} />
+          <h3 className="mt-4 font-medium text-sm text-gray-700">
+            {product.name}
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">{productCategoryLabel}</p>
+          <p className="mt-1 font-medium text-sm text-gray-900">
+            {formatPrice(product.price)}
+          </p>
+        </div>
+      </Link>
     );
 };
 
