@@ -5,7 +5,6 @@ import { getPayloadClient } from "../get-payload";
 import { stripe } from "../lib/stripe";
 import type Stripe from "stripe";
 
-//9:24:37
 export const paymentRouter = router({
   createSession: privateProcedure
     .input(z.object({ productIds: z.array(z.string()) }))
@@ -13,9 +12,12 @@ export const paymentRouter = router({
       const { user } = ctx;
       let { productIds } = input;
 
-      if (productIds.length === 0) throw new TRPCError({ code: "BAD_REQUEST" });
+      if (productIds.length === 0) {
+        throw new TRPCError({ code: "BAD_REQUEST" });
+      }
 
       const payload = await getPayloadClient();
+
       const { docs: products } = await payload.find({
         collection: "products",
         where: {
@@ -44,8 +46,9 @@ export const paymentRouter = router({
           quantity: 1,
         });
       });
+
       line_items.push({
-        price: "price_1OWlcvLWJIj0fS6qMoMm8K3R",
+        price: "price_1OWmO0LWJIj0fS6qCsav1ISm",
         quantity: 1,
         adjustable_quantity: {
           enabled: false,
@@ -67,9 +70,31 @@ export const paymentRouter = router({
 
         return { url: stripeSession.url };
       } catch (err) {
-        console.log(err);
-
         return { url: null };
       }
+    }),
+  pollOrderStatus: privateProcedure
+    .input(z.object({ orderId: z.string() }))
+    .query(async ({ input }) => {
+      const { orderId } = input;
+
+      const payload = await getPayloadClient();
+
+      const { docs: orders } = await payload.find({
+        collection: "orders",
+        where: {
+          id: {
+            equals: orderId,
+          },
+        },
+      });
+
+      if (!orders.length) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const [order] = orders;
+
+      return { isPaid: order._isPaid };
     }),
 });
